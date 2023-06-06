@@ -34,11 +34,11 @@ class ImageNet(Dataset):
         for folder in folders:
             img_list += [os.path.join(folder, item) for item in os.listdir(folder)[:10000]]
 
-        # self.data = defaultdict()
-        # for i, img_path in tqdm(enumerate(img_list), total=len(img_list)):
-        #     self.data[i] = self.load_sample(img_path)
+        self.data = defaultdict()
+        for i, img_path in tqdm(enumerate(img_list), total=len(img_list)):
+            self.data[i] = self.load_sample(img_path)
 
-        self.data = process_map(self.load_sample, img_list, chunksize=200)
+        #self.data = process_map(self.load_sample, img_list, chunksize=200)
 
     def __getitem__(self, item):
         return self.data[item]
