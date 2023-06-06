@@ -51,7 +51,7 @@ if __name__ == "__main__":
     for e in range(300):
         # ------------------ TRAIN ------------------
         vit_model.train()
-        writer.add_scalar("lr", lr_scheduler.get_lr(), global_step=e)
+        writer.add_scalar("lr", lr_scheduler.get_lr()[0], global_step=e)
         with tqdm(enumerate(train_dataloader), total=len(train_dataloader), desc=f"Epoch {e}", leave=False) as pbar:
             total_loss = 0.0
             total_acc = 0.0
