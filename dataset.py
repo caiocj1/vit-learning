@@ -31,10 +31,16 @@ class ImageNet(Dataset):
 
         self.img_list = []
         for folder in folders:
-            self.img_list += [os.path.join(folder, item) for item in os.listdir(folder)]
+            self.img_list += [os.path.join(folder, item) for item in os.listdir(folder)[:1000]]
+
+        print("Loading", type, "dataset...")
+        self.data = defaultdict()
+        for i, path in tqdm(enumerate(self.img_list), total=len(self.img_list)):
+            self.data[i] = self.load_sample(path)
 
     def __getitem__(self, item):
-        return self.load_sample(self.img_list[item])
+        #return self.load_sample(self.img_list[item])
+        return self.data[item]
 
     def __len__(self):
         return len(self.img_list)
