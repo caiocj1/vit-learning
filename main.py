@@ -23,13 +23,13 @@ if __name__ == "__main__":
     train_dataset = ImageNet(type="train")
     train_dataloader = DataLoader(train_dataset,
                                   batch_size=512,
-                                  #num_workers=16,
+                                  num_workers=32,
                                   shuffle=True)
 
     val_dataset = ImageNet(type="val")
     val_dataloader = DataLoader(train_dataset,
                                 batch_size=512,
-                                #num_workers=16,
+                                num_workers=32,
                                 shuffle=False)
 
     # ------------------ GET MODEL ------------------
