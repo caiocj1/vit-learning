@@ -21,17 +21,17 @@ if __name__ == "__main__":
 
     # ------------------ LOAD DATA ------------------
     train_dataset = ImageNet(type="train")
-    train_dataloader = DataLoader(train_dataset, batch_size=20, num_workers=12, shuffle=True)
+    train_dataloader = DataLoader(train_dataset, batch_size=512, num_workers=16, shuffle=True)
 
     val_dataset = ImageNet(type="val")
-    val_dataloader = DataLoader(train_dataset, batch_size=20, num_workers=12, shuffle=False)
+    val_dataloader = DataLoader(train_dataset, batch_size=512, num_workers=16, shuffle=False)
 
     # ------------------ GET MODEL ------------------
     vit_model = ViT().to(device)
 
     # ------------------ TRAINING PARAMATERS, LOGGING ------------------
     loss_fn = nn.CrossEntropyLoss()
-    optim = torch.optim.Adam(vit_model.parameters(), weight_decay=0.3, lr=3e-3)
+    optim = torch.optim.Adam(vit_model.parameters(), weight_decay=0.3, lr=3e-4)
     lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=300)
 
     writer = SummaryWriter(log_dir=f"tb_logs/{args.version}")

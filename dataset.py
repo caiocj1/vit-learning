@@ -32,27 +32,13 @@ class ImageNet(Dataset):
         print("Loading", type, "dataset...")
         img_list = []
         for folder in folders:
-            img_list += [os.path.join(folder, item) for item in os.listdir(folder)]
+            img_list += [os.path.join(folder, item) for item in os.listdir(folder)[:10000]]
+
+        # self.data = defaultdict()
+        # for i, img_path in tqdm(enumerate(img_list), total=len(img_list)):
+        #     self.data[i] = self.load_sample(img_path)
 
         self.data = process_map(self.load_sample, img_list, chunksize=5)
-                # #print(img_path)
-                # label = os.path.splitext(img_path)[0].split("_")[-1]
-                # label = np.argmax(np.array(list(IMAGENET2012_CLASSES.keys())) == label)
-                #
-                # img = Image.open(os.path.join(folder, img_path))
-                # if img.mode != "RGB":
-                #     img = img.convert("RGB")
-                # img = self.preprocess(img)
-                # #img = np.array(img) / 255
-                # # if len(img.shape) == 3:
-                # #     img = img.transpose((2, 0, 1))
-                # # else:
-                # #     img = img[None]
-                # # img = torch.tensor(img)
-                #
-                # self.data[i] = defaultdict()
-                # self.data[i]["img"] = img
-                # self.data[i]["label"] = label
 
     def __getitem__(self, item):
         return self.data[item]
