@@ -32,7 +32,7 @@ class ImageNet(Dataset):
         #print("Loading", type, "dataset...")
         self.img_list = []
         for folder in folders:
-            self.img_list += [os.path.join(folder, item) for item in os.listdir(folder)[:10000]]
+            self.img_list += [os.path.join(folder, item) for item in os.listdir(folder)]
 
         # self.data = defaultdict()
         # for i, img_path in tqdm(enumerate(img_list), total=len(img_list)):

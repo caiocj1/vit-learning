@@ -21,10 +21,16 @@ if __name__ == "__main__":
 
     # ------------------ LOAD DATA ------------------
     train_dataset = ImageNet(type="train")
-    train_dataloader = DataLoader(train_dataset, batch_size=512, num_workers=16, shuffle=True)
+    train_dataloader = DataLoader(train_dataset,
+                                  batch_size=512,
+                                  #num_workers=16,
+                                  shuffle=True)
 
     val_dataset = ImageNet(type="val")
-    val_dataloader = DataLoader(train_dataset, batch_size=512, num_workers=16, shuffle=False)
+    val_dataloader = DataLoader(train_dataset,
+                                batch_size=512,
+                                #num_workers=16,
+                                shuffle=False)
 
     # ------------------ GET MODEL ------------------
     vit_model = ViT().to(device)
