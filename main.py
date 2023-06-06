@@ -22,14 +22,14 @@ if __name__ == "__main__":
     # ------------------ LOAD DATA ------------------
     train_dataset = ImageNet(type="train")
     train_dataloader = DataLoader(train_dataset,
-                                  batch_size=512,
-                                  num_workers=32,
+                                  batch_size=256,
+                                  num_workers=64,
                                   shuffle=True)
 
     val_dataset = ImageNet(type="val")
     val_dataloader = DataLoader(train_dataset,
-                                batch_size=512,
-                                num_workers=32,
+                                batch_size=256,
+                                num_workers=64,
                                 shuffle=False)
 
     # ------------------ GET MODEL ------------------
@@ -72,6 +72,8 @@ if __name__ == "__main__":
                 total_acc += corrects
                 writer.add_scalar("acc/train_step", corrects / len(predictions),
                                   global_step=e * len(train_dataloader) + i)
+
+        lr_scheduler.step()
 
         writer.add_scalar("loss/train_epoch", total_loss / len(train_dataloader), global_step=e * len(train_dataloader) + i)
         writer.add_scalar("acc/train_epoch", total_acc / len(train_dataset), global_step=e * len(train_dataloader) + i)
