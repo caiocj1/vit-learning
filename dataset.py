@@ -31,7 +31,7 @@ class ImageNet(Dataset):
 
         self.img_list = []
         for folder in folders:
-            self.img_list += [os.path.join(folder, item) for item in os.listdir(folder)[:1000]]
+            self.img_list += [os.path.join(folder, item) for item in os.listdir(folder)[:20000]]
 
         print("Loading", type, "dataset...")
         self.data = defaultdict()
