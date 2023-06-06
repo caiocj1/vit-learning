@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
+import pytorch_warmup as warmup
 from tqdm import tqdm
 
 from dataset import ImageNet
@@ -40,8 +41,9 @@ if __name__ == "__main__":
 
     # ------------------ TRAINING PARAMATERS, LOGGING ------------------
     loss_fn = nn.CrossEntropyLoss()
-    optim = torch.optim.Adam(vit_model.parameters(), weight_decay=0.3, lr=3e-4)
+    optim = torch.optim.AdamW(vit_model.parameters(), weight_decay=0.03, lr=3e-3)
     lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=300)
+    warmup_scheduler = warmup.LinearWarmup(optim, warmup_period=5)
 
     writer = SummaryWriter(log_dir=f"tb_logs/{args.version}")
 
@@ -75,7 +77,9 @@ if __name__ == "__main__":
                 writer.add_scalar("acc/train_step", corrects / len(predictions),
                                   global_step=e * len(train_dataloader) + i)
 
-        lr_scheduler.step()
+        writer.add_scalar("lr", lr_scheduler.get_lr(), global_step=e)
+        with warmup_scheduler.dampening():
+            lr_scheduler.step()
 
         writer.add_scalar("loss/train_epoch", total_loss / len(train_dataloader), global_step=e * len(train_dataloader) + i)
         writer.add_scalar("acc/train_epoch", total_acc / len(train_dataset), global_step=e * len(train_dataloader) + i)
