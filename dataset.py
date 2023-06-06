@@ -28,17 +28,10 @@ class ImageNet(Dataset):
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ])
-        #self.data = defaultdict()
-        #print("Loading", type, "dataset...")
+
         self.img_list = []
         for folder in folders:
             self.img_list += [os.path.join(folder, item) for item in os.listdir(folder)]
-
-        # self.data = defaultdict()
-        # for i, img_path in tqdm(enumerate(img_list), total=len(img_list)):
-        #     self.data[i] = self.load_sample(img_path)
-
-        #self.data = process_map(self.load_sample, img_list, chunksize=200)
 
     def __getitem__(self, item):
         return self.load_sample(self.img_list[item])
