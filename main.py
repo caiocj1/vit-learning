@@ -22,14 +22,14 @@ if __name__ == "__main__":
     # ------------------ LOAD DATA ------------------
     train_dataset = ImageNet(type="train")
     train_dataloader = DataLoader(train_dataset,
-                                  batch_size=1024,
+                                  batch_size=128,
                                   num_workers=32,
                                   shuffle=True,
                                   pin_memory=False)
 
     val_dataset = ImageNet(type="val")
     val_dataloader = DataLoader(train_dataset,
-                                batch_size=1024,
+                                batch_size=128,
                                 num_workers=32,
                                 shuffle=False,
                                 pin_memory=False)
