@@ -4,11 +4,13 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
+from torchvision.datasets import ImageFolder
+from torchvision import transforms
 import pytorch_warmup as warmup
 from tqdm import tqdm
 
-from dataset import ImageNet
 from models.vit import ViT
+
 
 if __name__ == "__main__":
     # ------------------ ARGUMENT PARSING ------------------
@@ -21,19 +23,26 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # ------------------ LOAD DATA ------------------
-    train_dataset = ImageNet(type="train")
+    preprocess = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+    #train_dataset = ImageNet(type="train")
+    train_dataset = ImageFolder("inputs/imagenet/train", transform=preprocess)
     train_dataloader = DataLoader(train_dataset,
                                   batch_size=512,
-                                  num_workers=32,
-                                  shuffle=True,
-                                  pin_memory=False)
+                                  num_workers=4,
+                                  shuffle=True)
 
-    val_dataset = ImageNet(type="val")
-    val_dataloader = DataLoader(train_dataset,
+    #val_dataset = ImageNet(type="val")
+    val_dataset = ImageFolder("inputs/imagenet/val", transform=preprocess)
+    val_dataloader = DataLoader(val_dataset,
                                 batch_size=512,
-                                num_workers=32,
-                                shuffle=False,
-                                pin_memory=False)
+                                num_workers=4,
+                                shuffle=False)
 
     # ------------------ GET MODEL ------------------
     vit_model = ViT().to(device)
@@ -43,7 +52,7 @@ if __name__ == "__main__":
     loss_fn = nn.CrossEntropyLoss()
     optim = torch.optim.AdamW(vit_model.parameters(), weight_decay=0.03, lr=3e-3)
     lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=300)
-    warmup_scheduler = warmup.LinearWarmup(optim, warmup_period=5)
+    warmup_scheduler = warmup.UntunedLinearWarmup(optim)
 
     writer = SummaryWriter(log_dir=f"tb_logs/{args.version}")
 
@@ -51,29 +60,31 @@ if __name__ == "__main__":
     for e in range(300):
         # ------------------ TRAIN ------------------
         vit_model.train()
-        writer.add_scalar("lr", lr_scheduler.get_lr()[0], global_step=e)
+        writer.add_scalar("lr", optim.param_groups[0]['lr'], global_step=e)
         with tqdm(enumerate(train_dataloader), total=len(train_dataloader), desc=f"Epoch {e}", leave=False) as pbar:
             total_loss = 0.0
             total_acc = 0.0
 
             for i, batch in pbar:
-                for key in batch:
-                    batch[key] = batch[key].to(device)
+                x, y = batch
+                x = x.to(device)
+                y = y.to(device)
 
-                predictions = vit_model(batch)
+                predictions = vit_model(x)
 
-                loss = loss_fn(predictions, batch["label"])
+                loss = loss_fn(predictions, y)
 
                 optim.zero_grad()
                 loss.backward()
                 optim.step()
 
+                # ------------------ LOGGING ------------------
                 pbar.set_postfix(loss='{:.10f}'.format(loss.item()))
 
                 total_loss += loss.item()
                 writer.add_scalar("loss/train_step", loss.item(), global_step=e * len(train_dataloader) + i)
 
-                corrects = (torch.argmax(predictions, dim=-1) == batch["label"]).sum()
+                corrects = (torch.argmax(predictions, dim=-1) == y).sum()
                 total_acc += corrects
                 writer.add_scalar("acc/train_step", corrects / len(predictions),
                                   global_step=e * len(train_dataloader) + i)
@@ -91,18 +102,20 @@ if __name__ == "__main__":
             total_acc = 0.0
 
             for i, batch in pbar:
-                for key in batch:
-                    batch[key] = batch[key].to(device)
+                x, y = batch
+                x = x.to(device)
+                y = y.to(device)
 
-                predictions = vit_model(batch)
+                predictions = vit_model(x)
 
-                loss = loss_fn(predictions, batch["label"])
+                loss = loss_fn(predictions, y)
 
+                # ------------------ LOGGING ------------------
                 pbar.set_postfix(loss='{:.10f}'.format(loss.item()))
 
                 total_loss += loss.item()
 
-                corrects = (torch.argmax(predictions, dim=-1) == batch["label"]).sum()
+                corrects = (torch.argmax(predictions, dim=-1) == y).sum()
                 total_acc += corrects
 
         writer.add_scalar("loss/val_epoch", total_loss / len(val_dataloader), global_step=e * len(val_dataloader) + i)

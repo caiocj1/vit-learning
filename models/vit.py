@@ -75,8 +75,8 @@ class ViT(nn.Module):
 
         self.classification_head = nn.Linear(hidden_size, 1000)
 
-    def forward(self, batch):
-        x = self.patch_embedding(batch["img"])
+    def forward(self, x):
+        x = self.patch_embedding(x)
         b, n, _ = x.shape
         class_tokens = torch.stack([self.class_token] * b, dim=0)
 
