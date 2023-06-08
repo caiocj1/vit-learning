@@ -33,14 +33,14 @@ if __name__ == "__main__":
     #train_dataset = ImageNet(type="train")
     train_dataset = ImageFolder("inputs/imagenet/train", transform=preprocess)
     train_dataloader = DataLoader(train_dataset,
-                                  batch_size=512,
+                                  batch_size=128,
                                   num_workers=32,
                                   shuffle=True)
 
     #val_dataset = ImageNet(type="val")
     val_dataset = ImageFolder("inputs/imagenet/val", transform=preprocess)
     val_dataloader = DataLoader(val_dataset,
-                                batch_size=512,
+                                batch_size=128,
                                 num_workers=32,
                                 shuffle=False)
 
@@ -50,9 +50,9 @@ if __name__ == "__main__":
 
     # ------------------ TRAINING PARAMATERS, LOGGING ------------------
     loss_fn = nn.CrossEntropyLoss()
-    optim = torch.optim.AdamW(vit_model.parameters(), weight_decay=0.03, lr=3e-3)
-    lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=300)
-    warmup_scheduler = warmup.UntunedLinearWarmup(optim)
+    optim = torch.optim.AdamW(vit_model.parameters(), weight_decay=0.065, lr=5e-4)
+    lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=310)
+    #   warmup_scheduler = warmup.UntunedLinearWarmup(optim)
 
     writer = SummaryWriter(log_dir=f"tb_logs/{args.version}")
 
@@ -89,8 +89,8 @@ if __name__ == "__main__":
                 writer.add_scalar("acc/train_step", corrects / len(predictions),
                                   global_step=e * len(train_dataloader) + i)
 
-        with warmup_scheduler.dampening():
-            lr_scheduler.step()
+        #with warmup_scheduler.dampening():
+        lr_scheduler.step()
 
         writer.add_scalar("loss/train_epoch", total_loss / len(train_dataloader), global_step=e * len(train_dataloader) + i)
         writer.add_scalar("acc/train_epoch", total_acc / len(train_dataset), global_step=e * len(train_dataloader) + i)
