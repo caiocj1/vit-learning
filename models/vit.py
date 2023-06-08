@@ -52,7 +52,7 @@ class MultiheadAttention(nn.Module):
         attn = self.dropout(self.attend(dots))
 
         out = torch.matmul(attn, v)
-        out.transpose(1, 2).reshape(b, n, -1)
+        out = out.transpose(1, 2).reshape(b, n, -1)
         return self.out(out)
 
 class TransformerBlock(nn.Module):
