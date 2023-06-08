@@ -73,7 +73,10 @@ class ViT(nn.Module):
 
         self.transformer_encoder = TransformerEncoder(hidden_size, num_blocks, num_heads, dropout, mlp_size)
 
-        self.classification_head = nn.Linear(hidden_size, 1000)
+        self.classification_head = nn.Sequential(
+            nn.LayerNorm(hidden_size),
+            nn.Linear(hidden_size, 1000)
+        )
 
     def forward(self, x):
         x = self.patch_embedding(x)
