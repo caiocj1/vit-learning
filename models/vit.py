@@ -11,7 +11,7 @@ class PatchEmbedding(nn.Module):
         self.image_size = image_size
         self.patch_size = patch_size
 
-        self.num_patches = image_size ** 2 // (patch_size ** 2)
+        self.num_patches = (image_size // patch_size) ** 2
 
         self.linear = nn.Linear(self.num_channels * (self.patch_size ** 2), hidden_size)
 
@@ -27,7 +27,7 @@ class MultiheadAttention(nn.Module):
         self.w_k = nn.Linear(hidden_size, hidden_size)
         self.w_v = nn.Linear(hidden_size, hidden_size)
 
-        self.multihead_attn = nn.MultiheadAttention(hidden_size, num_heads=num_heads, dropout=dropout)
+        self.multihead_attn = nn.MultiheadAttention(hidden_size, num_heads=num_heads, dropout=dropout, batch_first=True)
 
     def forward(self, x):
         q, k, v = self.w_q(x), self.w_k(x), self.w_v(x)
