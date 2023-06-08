@@ -34,14 +34,14 @@ if __name__ == "__main__":
     train_dataset = ImageFolder("inputs/imagenet/train", transform=preprocess)
     train_dataloader = DataLoader(train_dataset,
                                   batch_size=1024,
-                                  num_workers=32,
+                                  num_workers=16,
                                   shuffle=True)
 
     #val_dataset = ImageNet(type="val")
     val_dataset = ImageFolder("inputs/imagenet/val", transform=preprocess)
     val_dataloader = DataLoader(val_dataset,
                                 batch_size=1024,
-                                num_workers=32,
+                                num_workers=16,
                                 shuffle=False)
 
     # ------------------ GET MODEL ------------------
