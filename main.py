@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     # ------------------ GET MODEL ------------------
     vit_model = ViT().to(device)
-    vit_model = nn.DataParallel(vit_model)
+    #vit_model = nn.DataParallel(vit_model)
 
     # ------------------ TRAINING PARAMATERS, LOGGING ------------------
     loss_fn = nn.CrossEntropyLoss()
