@@ -33,8 +33,6 @@ class MultiheadAttention(nn.Module):
         self.attend = nn.Softmax(dim=-1)
         self.dropout = nn.Dropout(dropout)
 
-        #self.multihead_attn = nn.MultiheadAttention(self.inner_dim, num_heads=num_heads, dropout=dropout, batch_first=True)
-
         self.out = nn.Sequential(
             nn.Linear(self.inner_dim, hidden_size),
             nn.Dropout(dropout)
@@ -48,10 +46,10 @@ class MultiheadAttention(nn.Module):
         k = k.reshape(b, n, self.num_heads, -1).transpose(1, 2)
         v = v.reshape(b, n, self.num_heads, -1).transpose(1, 2)
 
-        dots = torch.matmul(q, k.transpose(-1, -2)) * self.scale
-        attn = self.dropout(self.attend(dots))
+        out = torch.matmul(q, k.transpose(-1, -2)) * self.scale
+        out = self.dropout(self.attend(out))
 
-        out = torch.matmul(attn, v)
+        out = torch.matmul(out, v)
         out = out.transpose(1, 2).reshape(b, n, -1)
         return self.out(out)
 
