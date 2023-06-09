@@ -33,20 +33,20 @@ if __name__ == "__main__":
     #train_dataset = ImageNet(type="train")
     train_dataset = ImageFolder("inputs/imagenet/train", transform=preprocess)
     train_dataloader = DataLoader(train_dataset,
-                                  batch_size=1024,
+                                  batch_size=256,
                                   num_workers=64,
                                   shuffle=True)
 
     #val_dataset = ImageNet(type="val")
     val_dataset = ImageFolder("inputs/imagenet/val", transform=preprocess)
     val_dataloader = DataLoader(val_dataset,
-                                batch_size=1024,
+                                batch_size=256,
                                 num_workers=64,
                                 shuffle=False)
 
     # ------------------ GET MODEL ------------------
     vit_model = ViT().to(device)
-    #vit_model = nn.DataParallel(vit_model)
+    vit_model = nn.DataParallel(vit_model)
 
     # ------------------ TRAINING PARAMATERS, LOGGING ------------------
     loss_fn = nn.CrossEntropyLoss()
