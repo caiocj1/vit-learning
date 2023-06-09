@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
-import torch.functional as F
-import math
+
 
 class PatchEmbedding(nn.Module):
     def __init__(self, hidden_size, num_channels=3, image_size=224, patch_size=32):
@@ -20,6 +19,7 @@ class PatchEmbedding(nn.Module):
     def forward(self, imgs):
         imgs = imgs.view(-1, self.num_patches, self.num_channels * (self.patch_size ** 2))
         return self.layer_norm2(self.linear(self.layer_norm1(imgs)))
+
 
 class MultiheadAttention(nn.Module):
     def __init__(self, hidden_size, num_heads, dropout, head_size=64):
@@ -53,6 +53,7 @@ class MultiheadAttention(nn.Module):
         out = out.transpose(1, 2).reshape(b, n, -1)
         return self.out(out)
 
+
 class TransformerBlock(nn.Module):
     def __init__(self, hidden_size, num_heads, dropout, mlp_size):
         super().__init__()
@@ -72,6 +73,7 @@ class TransformerBlock(nn.Module):
         x = x + self.multihead_attn(self.layer_norm1(x))
         return x + self.mlp(self.layer_norm2(x))
 
+
 class TransformerEncoder(nn.Module):
     def __init__(self, hidden_size, num_blocks, num_heads, dropout, mlp_size):
         super().__init__()
@@ -81,12 +83,13 @@ class TransformerEncoder(nn.Module):
             self.layers.append(TransformerBlock(hidden_size, num_heads, dropout, mlp_size))
 
     def forward(self, x):
-        for block in self.layers:
-            x = block(x)
+        for layer in self.layers:
+            x = layer(x)
         return x
 
+
 class ViT(nn.Module):
-    def __init__(self, hidden_size=768, num_blocks=12, num_heads=12, dropout=0.0, mlp_size=3072):
+    def __init__(self, hidden_size=768, num_blocks=12, num_heads=12, dropout=0.0, mlp_size=3072, num_classes=1000):
         super().__init__()
         self.hidden_size = hidden_size
 
@@ -98,7 +101,7 @@ class ViT(nn.Module):
 
         self.classification_head = nn.Sequential(
             nn.LayerNorm(hidden_size),
-            nn.Linear(hidden_size, 1000)
+            nn.Linear(hidden_size, num_classes)
         )
 
     def forward(self, x):
