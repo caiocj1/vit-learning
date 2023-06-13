@@ -19,7 +19,7 @@ class Trainer:
 
         self.loss_fn = nn.CrossEntropyLoss()
         self.optim = torch.optim.Adam(model.parameters(), weight_decay=self.weight_decay, lr=self.lr)
-        self.lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optim, T_max=self.n_iter)
+        self.lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optim, T_max=self.n_iter * 1252)
         self.warmup = warmup.LinearWarmup(self.optim, 10000)
         self.device = device
 
@@ -55,6 +55,7 @@ class Trainer:
                 nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
                 self.optim.step()
 
+                self.writer.add_scalar("lr", self.optim.param_groups[0]['lr'], global_step=epoch * len(self.train_dataloader) + i)
                 with self.warmup.dampening():
                     self.lr_scheduler.step()
 
@@ -101,8 +102,6 @@ class Trainer:
     def train(self):
         try:
             for epoch in range(self.n_iter):
-                self.writer.add_scalar("lr", self.optim.param_groups[0]['lr'], global_step=epoch)
-
                 epoch_loss, epoch_acc = self.train_loop(epoch)
 
                 self.writer.add_scalar("loss/train_epoch", epoch_loss, global_step=epoch)
