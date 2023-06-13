@@ -66,7 +66,7 @@ if __name__ == "__main__":
         val_preprocess
     ])
 
-    train_dataset = CachedImageFolder("inputs/imagenet/train", transform=train_preprocess)
+    train_dataset = CachedImageFolder("inputs/imagenet/train", transform=val_preprocess)
     train_dataloader = DataLoader(train_dataset,
                                   batch_size=1024,
                                   num_workers=16,
