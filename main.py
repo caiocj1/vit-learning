@@ -22,20 +22,24 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # ------------------ LOAD DATA ------------------
-    preprocess = transforms.Compose([
+    val_preprocess = transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
+    train_preprocess = transforms.Compose([
+        transforms.RandAugment(num_ops=2, magnitude=15),
+        val_preprocess
+    ])
 
-    train_dataset = ImageFolder("inputs/imagenet/train", transform=preprocess)
+    train_dataset = ImageFolder("inputs/imagenet/train", transform=train_preprocess)
     train_dataloader = DataLoader(train_dataset,
                                   batch_size=1024,
                                   num_workers=16,
                                   shuffle=True)
 
-    val_dataset = ImageFolder("inputs/imagenet/val", transform=preprocess)
+    val_dataset = ImageFolder("inputs/imagenet/val", transform=val_preprocess)
     val_dataloader = DataLoader(val_dataset,
                                 batch_size=1024,
                                 num_workers=16,
