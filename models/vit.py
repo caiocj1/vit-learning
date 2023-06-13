@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class PatchEmbedding(nn.Module):
-    def __init__(self, hidden_size, num_channels=3, image_size=224, patch_size=32):
+    def __init__(self, hidden_size, num_channels, image_size, patch_size):
         super().__init__()
 
         self.num_channels = num_channels
@@ -89,11 +89,13 @@ class TransformerEncoder(nn.Module):
 
 
 class ViT(nn.Module):
-    def __init__(self, hidden_size=768, num_blocks=12, num_heads=12, dropout=0.0, mlp_size=3072, num_classes=1000):
+    def __init__(self, num_channels=3, image_size=224, patch_size=32,
+                 hidden_size=768, num_blocks=12, num_heads=12,
+                 dropout=0.0, mlp_size=3072, num_classes=1000):
         super().__init__()
         self.hidden_size = hidden_size
 
-        self.patch_embedding = PatchEmbedding(hidden_size)
+        self.patch_embedding = PatchEmbedding(hidden_size, num_channels, image_size, patch_size)
         self.pos_encoding = nn.Parameter(torch.randn(1, 1 + self.patch_embedding.num_patches, hidden_size))
         self.class_token = nn.Parameter(torch.randn((1, hidden_size)))
 
