@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
+from torchvision.models import vit_b_16
 from torchvision import transforms
 import os
 
@@ -78,13 +79,15 @@ if __name__ == "__main__":
                                 shuffle=False)
 
     # ------------------ GET MODEL ------------------
-    config_path = os.path.join(os.getcwd(), "config.yaml")
-    with open(config_path) as f:
-        params = yaml.load(f, Loader=yaml.SafeLoader)
-    vit_params = params["ViTParams"]
+    # config_path = os.path.join(os.getcwd(), "config.yaml")
+    # with open(config_path) as f:
+    #     params = yaml.load(f, Loader=yaml.SafeLoader)
+    # vit_params = params["ViTParams"]
+    #
+    # vit_model = ViT(**vit_params).to(device)
+    # vit_model = nn.DataParallel(vit_model)
 
-    vit_model = ViT(**vit_params).to(device)
-    vit_model = nn.DataParallel(vit_model)
+    vit_model = vit_b_16().to(device)
 
     # ------------------ GET TRAINER AND TRAIN ------------------
     trainer = Trainer(vit_model, train_dataloader, device, args.version, val_dataloader=val_dataloader)
