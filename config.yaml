@@ -1,7 +1,7 @@
 ViTParams:
   num_channels: 3
   image_size: 224
-  patch_size: 16
+  patch_size: 32
 
   hidden_size: 384
   num_blocks: 12
