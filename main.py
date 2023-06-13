@@ -79,13 +79,13 @@ if __name__ == "__main__":
                                 shuffle=False)
 
     # ------------------ GET MODEL ------------------
-    # config_path = os.path.join(os.getcwd(), "config.yaml")
-    # with open(config_path) as f:
-    #     params = yaml.load(f, Loader=yaml.SafeLoader)
-    # vit_params = params["ViTParams"]
-    #
-    # vit_model = ViT(**vit_params).to(device)
-    vit_model = vit_b_32().to(device)
+    config_path = os.path.join(os.getcwd(), "config.yaml")
+    with open(config_path) as f:
+        params = yaml.load(f, Loader=yaml.SafeLoader)
+    vit_params = params["ViTParams"]
+
+    vit_model = ViT(**vit_params).to(device)
+    # vit_model = vit_b_32().to(device)
     vit_model = nn.DataParallel(vit_model)
 
     # ------------------ GET TRAINER AND TRAIN ------------------
