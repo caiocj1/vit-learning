@@ -11,39 +11,6 @@ import os
 from trainer import Trainer
 from models.vit import ViT
 
-# ---------------------------------------
-from pathlib import Path
-import json
-from functools import wraps
-
-def file_cache(filename):
-    """Decorator to cache the output of a function to disk."""
-    def decorator(f):
-        @wraps(f)
-        def decorated(self, directory, *args, **kwargs):
-            filepath = Path(directory) / filename
-            if filepath.is_file():
-                out = json.loads(filepath.read_text())
-            else:
-                out = f(self, directory, *args, **kwargs)
-                filepath.write_text(json.dumps(out))
-            return out
-        return decorated
-    return decorator
-
-class CachedImageFolder(ImageFolder):
-    @file_cache(filename="cached_classes.json")
-    def find_classes(self, directory, *args, **kwargs):
-        classes = super().find_classes(directory, *args, **kwargs)
-        return classes
-
-    @file_cache(filename="cached_structure.json")
-    def make_dataset(self, directory, *args, **kwargs):
-        dataset = super().make_dataset(directory, *args, **kwargs)
-        return dataset
-
-# ---------------------------------------
-
 if __name__ == "__main__":
     # ------------------ ARGUMENT PARSING ------------------
     parser = argparse.ArgumentParser(description="ViT training", allow_abbrev=False)
@@ -66,13 +33,13 @@ if __name__ == "__main__":
         val_preprocess
     ])
 
-    train_dataset = CachedImageFolder("inputs/imagenet/train", transform=val_preprocess)
+    train_dataset = ImageFolder("inputs/imagenet/train", transform=val_preprocess)
     train_dataloader = DataLoader(train_dataset,
                                   batch_size=1024,
                                   num_workers=16,
                                   shuffle=True)
 
-    val_dataset = CachedImageFolder("inputs/imagenet/val", transform=val_preprocess)
+    val_dataset = ImageFolder("inputs/imagenet/val", transform=val_preprocess)
     val_dataloader = DataLoader(val_dataset,
                                 batch_size=1024,
                                 num_workers=16,
