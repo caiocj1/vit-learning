@@ -29,9 +29,7 @@ if __name__ == "__main__":
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
 
-    train_dataset = ImageFolder("inputs/imagenet/train",
-                                transform=transforms.Compose([transforms.RandAugment(num_ops=2, magnitude=15),
-                                                              preprocess]))
+    train_dataset = ImageFolder("inputs/imagenet/train", transform=preprocess)
     train_dataloader = DataLoader(train_dataset,
                                   batch_size=1024,
                                   num_workers=16,
