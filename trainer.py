@@ -16,9 +16,6 @@ class Trainer:
         self.train_dataloader = train_dataloader
         self.val_dataloader = val_dataloader
 
-        self.data_aug = transforms.Compose([
-            transforms.RandAugment(num_ops=2, magnitude=15)
-        ])
 
         self.loss_fn = nn.CrossEntropyLoss()
         self.optim = torch.optim.Adam(model.parameters(), weight_decay=self.weight_decay, lr=self.lr)
@@ -49,7 +46,6 @@ class Trainer:
                 x = x.to(self.device)
                 y = y.to(self.device)
 
-                self.data_aug(x)
                 predictions = self.model(x)
 
                 loss = self.loss_fn(predictions, y)
