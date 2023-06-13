@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
-from torchvision.models import vit_b_16
+from torchvision.models import vit_b_32
 from torchvision import transforms
 import os
 
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     # vit_model = ViT(**vit_params).to(device)
     # vit_model = nn.DataParallel(vit_model)
 
-    vit_model = vit_b_16().to(device)
+    vit_model = vit_b_32().to(device)
 
     # ------------------ GET TRAINER AND TRAIN ------------------
     trainer = Trainer(vit_model, train_dataloader, device, args.version, val_dataloader=val_dataloader)
