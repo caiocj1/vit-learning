@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from torch.utils.tensorboard import SummaryWriter
 from torchvision import transforms
+import pytorch_warmup as warmup
 from tqdm import tqdm
 import os
 import yaml
@@ -20,8 +21,9 @@ class Trainer:
         ])
 
         self.loss_fn = nn.CrossEntropyLoss()
-        self.optim = torch.optim.AdamW(model.parameters(), weight_decay=self.weight_decay, lr=self.lr)
+        self.optim = torch.optim.Adam(model.parameters(), weight_decay=self.weight_decay, lr=self.lr)
         self.lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optim, T_max=self.n_iter)
+        self.warmup = warmup.LinearWarmup(self.optim, 10000)
         self.device = device
 
         self.writer = SummaryWriter(log_dir=f"tb_logs/{version}")
@@ -54,7 +56,11 @@ class Trainer:
 
                 self.optim.zero_grad()
                 loss.backward()
+                nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
                 self.optim.step()
+
+                with self.warmup.dampening():
+                    self.lr_scheduler.step()
 
                 pbar.set_postfix(loss='{:.10f}'.format(loss.item()))
                 total_loss += loss.item()
@@ -102,7 +108,6 @@ class Trainer:
                 self.writer.add_scalar("lr", self.optim.param_groups[0]['lr'], global_step=epoch)
 
                 epoch_loss, epoch_acc = self.train_loop(epoch)
-                self.lr_scheduler.step()
 
                 self.writer.add_scalar("loss/train_epoch", epoch_loss, global_step=epoch)
                 self.writer.add_scalar("acc/train_epoch", epoch_acc, global_step=epoch)
