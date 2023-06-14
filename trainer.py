@@ -55,7 +55,8 @@ class Trainer:
                 #nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
                 self.optim.step()
 
-                self.writer.add_scalar("lr", self.optim.param_groups[0]['lr'], global_step=epoch * len(self.train_dataloader) + i)
+                self.writer.add_scalar("lr", self.optim.param_groups[0]['lr'],
+                                       global_step=epoch * len(self.train_dataloader) + i)
                 with self.warmup.dampening():
                     self.lr_scheduler.step()
 

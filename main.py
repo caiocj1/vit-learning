@@ -22,30 +22,26 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # ------------------ LOAD DATA ------------------
-    val_preprocess = transforms.Compose([
+    preprocess = transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
-    train_preprocess = transforms.Compose([
-        transforms.RandAugment(num_ops=2, magnitude=15),
-        val_preprocess
-    ])
 
-    train_dataset = ImageFolder("inputs/imagenet/train", transform=val_preprocess)
+    train_dataset = ImageFolder("inputs/imagenet/train", transform=preprocess)
     train_dataloader = DataLoader(train_dataset,
                                   batch_size=1024,
-                                  num_workers=16,
+                                  num_workers=32,
                                   shuffle=True,
-                                  prefetch_factor=4, pin_memory=True, persistent_workers=True)
+                                  pin_memory=True, persistent_workers=True)
 
-    val_dataset = ImageFolder("inputs/imagenet/val", transform=val_preprocess)
+    val_dataset = ImageFolder("inputs/imagenet/val", transform=preprocess)
     val_dataloader = DataLoader(val_dataset,
                                 batch_size=1024,
-                                num_workers=4,
+                                num_workers=32,
                                 shuffle=False,
-                                prefetch_factor=4, pin_memory=True, persistent_workers=True)
+                                pin_memory=True, persistent_workers=True)
 
     # ------------------ GET MODEL ------------------
     config_path = os.path.join(os.getcwd(), "config.yaml")
