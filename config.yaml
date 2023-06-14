@@ -12,5 +12,5 @@ ViTParams:
 
 TrainerParams:
   n_iter: 300
-  lr: 0.003
-  weight_decay: 0.3
+  lr: 0.0005
+  weight_decay: 0.065
