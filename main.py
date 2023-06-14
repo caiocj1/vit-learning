@@ -31,14 +31,14 @@ if __name__ == "__main__":
 
     train_dataset = ImageFolder("inputs/imagenet/train", transform=preprocess)
     train_dataloader = DataLoader(train_dataset,
-                                  batch_size=1024,
+                                  batch_size=512,
                                   num_workers=32,
                                   shuffle=True,
                                   pin_memory=True, persistent_workers=True)
 
     val_dataset = ImageFolder("inputs/imagenet/val", transform=preprocess)
     val_dataloader = DataLoader(val_dataset,
-                                batch_size=1024,
+                                batch_size=512,
                                 num_workers=32,
                                 shuffle=False,
                                 pin_memory=True, persistent_workers=True)
