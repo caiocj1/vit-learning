@@ -37,13 +37,15 @@ if __name__ == "__main__":
     train_dataloader = DataLoader(train_dataset,
                                   batch_size=1024,
                                   num_workers=16,
-                                  shuffle=True)
+                                  shuffle=True,
+                                  prefetch_factor=4, pin_memory=True, persistent_workers=True)
 
     val_dataset = ImageFolder("inputs/imagenet/val", transform=val_preprocess)
     val_dataloader = DataLoader(val_dataset,
                                 batch_size=1024,
-                                num_workers=16,
-                                shuffle=False)
+                                num_workers=4,
+                                shuffle=False,
+                                prefetch_factor=4, pin_memory=True, persistent_workers=True)
 
     # ------------------ GET MODEL ------------------
     config_path = os.path.join(os.getcwd(), "config.yaml")
