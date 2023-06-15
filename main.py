@@ -15,6 +15,7 @@ if __name__ == "__main__":
     # ------------------ ARGUMENT PARSING ------------------
     parser = argparse.ArgumentParser(description="ViT training", allow_abbrev=False)
 
+    parser.add_argument("--input", "-i", required=True, type=str, help="Path to imagenet.")
     parser.add_argument("--version", "-v", required=True, type=str, help="Version name for TensorBoard.")
 
     args = parser.parse_args()
@@ -29,16 +30,16 @@ if __name__ == "__main__":
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
 
-    train_dataset = ImageFolder("inputs/imagenet/train", transform=preprocess)
+    train_dataset = ImageFolder(os.path.join(args.input, "train"), transform=preprocess)
     train_dataloader = DataLoader(train_dataset,
-                                  batch_size=512,
+                                  batch_size=1024,
                                   num_workers=16,
                                   shuffle=True,
                                   pin_memory=True, persistent_workers=True)
 
-    val_dataset = ImageFolder("inputs/imagenet/val", transform=preprocess)
+    val_dataset = ImageFolder(os.path.join(args.input, "val"), transform=preprocess)
     val_dataloader = DataLoader(val_dataset,
-                                batch_size=512,
+                                batch_size=1024,
                                 num_workers=16,
                                 shuffle=False,
                                 pin_memory=True, persistent_workers=True)

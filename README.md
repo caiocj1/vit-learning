@@ -2,18 +2,17 @@
 ***
 
 Implementation of the vision transformer from [1],
-for self-educational purposes. Trains from scratch on ImageNet 1k. Uses
+for self-educational purposes. Trains from scratch. Uses
 multiple GPUs with `nn.DataParallel`.
 
 ### Usage
 
-Be sure to extract class-separated ImageNet into `inputs` folder following
-https://github.com/pytorch/examples/blob/main/imagenet/extract_ILSVRC.sh.
-
 To launch training,
-`python main.py -v <version_name>`
+`python main.py -v <version_name> -i <path_to_dataset>`.
 
-To track training, `tensorboard --logdir tb_logs`
+Make sure the path given has `train` and `val` folders with images separated by class.
+
+To track training, `tensorboard --logdir tb_logs`.
 
 ### Useful repositories:
 

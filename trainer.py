@@ -52,13 +52,13 @@ class Trainer:
 
                 self.optim.zero_grad()
                 loss.backward()
-                #nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+                # nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
                 self.optim.step()
 
                 self.writer.add_scalar("lr", self.optim.param_groups[0]['lr'],
                                        global_step=epoch * len(self.train_dataloader) + i)
-                with self.warmup.dampening():
-                    self.lr_scheduler.step()
+                #with self.warmup.dampening():
+                self.lr_scheduler.step()
 
                 pbar.set_postfix(loss='{:.10f}'.format(loss.item()))
                 total_loss += loss.item()
