@@ -33,13 +33,13 @@ if __name__ == "__main__":
 
     train_dataset = ImageFolder(os.path.join(args.input, "train"), transform=preprocess)
     train_dataloader = DataLoader(train_dataset,
-                                  batch_size=4096,
+                                  batch_size=1024,
                                   num_workers=16,
                                   shuffle=True)
 
     val_dataset = ImageFolder(os.path.join(args.input, "val"), transform=preprocess)
     val_dataloader = DataLoader(val_dataset,
-                                batch_size=4096,
+                                batch_size=1024,
                                 num_workers=16,
                                 shuffle=False)
 
