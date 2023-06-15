@@ -1,6 +1,5 @@
 import argparse
 
-import vit_pytorch
 import yaml
 import torch
 import torch.nn as nn
