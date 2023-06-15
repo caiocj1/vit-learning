@@ -50,8 +50,8 @@ if __name__ == "__main__":
         params = yaml.load(f, Loader=yaml.SafeLoader)
     vit_params = params["ViTParams"]
 
-    vit_model = ViT(**vit_params).to(device)
-    # vit_model = vit_b_32().to(device)
+    #vit_model = ViT(**vit_params).to(device)
+    vit_model = vit_b_32().to(device)
     vit_model = nn.DataParallel(vit_model)
 
     # ------------------ GET TRAINER AND TRAIN ------------------
