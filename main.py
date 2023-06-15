@@ -33,13 +33,13 @@ if __name__ == "__main__":
 
     train_dataset = ImageFolder(os.path.join(args.input, "train"), transform=preprocess)
     train_dataloader = DataLoader(train_dataset,
-                                  batch_size=1024,
+                                  batch_size=4096,
                                   num_workers=16,
                                   shuffle=True)
 
     val_dataset = ImageFolder(os.path.join(args.input, "val"), transform=preprocess)
     val_dataloader = DataLoader(val_dataset,
-                                batch_size=1024,
+                                batch_size=4096,
                                 num_workers=16,
                                 shuffle=False)
 
@@ -58,7 +58,7 @@ if __name__ == "__main__":
                                 # heads=12,
                                 # mlp_dim=3072,
                                 # dropout=0.0)
-    vit_model = vit_b_32().to(device)
+    vit_model = vit_b_32(dropout=0.1).to(device)
     vit_model = nn.DataParallel(vit_model)
 
     # ------------------ GET TRAINER AND TRAIN ------------------
