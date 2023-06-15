@@ -34,15 +34,13 @@ if __name__ == "__main__":
     train_dataloader = DataLoader(train_dataset,
                                   batch_size=1024,
                                   num_workers=16,
-                                  shuffle=True,
-                                  pin_memory=True, persistent_workers=True)
+                                  shuffle=True)
 
-    val_dataset = ImageFolder(os.path.join(args.input, "val"), transform=preprocess)
-    val_dataloader = DataLoader(val_dataset,
-                                batch_size=1024,
-                                num_workers=16,
-                                shuffle=False,
-                                pin_memory=True, persistent_workers=True)
+    # val_dataset = ImageFolder(os.path.join(args.input, "val"), transform=preprocess)
+    # val_dataloader = DataLoader(val_dataset,
+    #                             batch_size=1024,
+    #                             num_workers=16,
+    #                             shuffle=False)
 
     # ------------------ GET MODEL ------------------
     config_path = os.path.join(os.getcwd(), "config.yaml")
@@ -50,10 +48,12 @@ if __name__ == "__main__":
         params = yaml.load(f, Loader=yaml.SafeLoader)
     vit_params = params["ViTParams"]
 
-    #vit_model = ViT(**vit_params).to(device)
-    vit_model = vit_b_32().to(device)
+    vit_model = ViT(**vit_params).to(device)
+    #vit_model = vit_b_32().to(device)
     vit_model = nn.DataParallel(vit_model)
 
     # ------------------ GET TRAINER AND TRAIN ------------------
-    trainer = Trainer(vit_model, train_dataloader, device, args.version, val_dataloader=val_dataloader)
+    trainer = Trainer(vit_model, train_dataloader, device, args.version,
+                      #val_dataloader=val_dataloader
+                      )
     trainer.train()

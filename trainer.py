@@ -37,7 +37,8 @@ class Trainer:
 
     def train_loop(self, epoch):
         self.model.train()
-        with tqdm(enumerate(self.train_dataloader), total=len(self.train_dataloader), desc=f"Epoch {epoch}", leave=False) as pbar:
+        with tqdm(enumerate(self.train_dataloader), total=len(self.train_dataloader),
+                  desc=f"Epoch {epoch}", leave=False) as pbar:
             total_loss = 0.0
             total_acc = 0.0
 
@@ -77,7 +78,8 @@ class Trainer:
     def val_loop(self, epoch):
         self.model.eval()
         with torch.no_grad():
-            with tqdm(enumerate(self.val_dataloader), total=len(self.val_dataloader), desc=f"Epoch {epoch}", leave=False) as pbar:
+            with tqdm(enumerate(self.val_dataloader), total=len(self.val_dataloader),
+                      desc=f"Epoch {epoch}", leave=False) as pbar:
                 total_loss = 0.0
                 total_acc = 0.0
 
