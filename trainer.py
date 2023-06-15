@@ -36,7 +36,6 @@ class Trainer:
         self.weight_decay = trainer_params["weight_decay"]
 
     def train_loop(self, epoch):
-        self.model.train()
         with tqdm(enumerate(self.train_dataloader), total=len(self.train_dataloader),
                   desc=f"Epoch {epoch}", leave=False) as pbar:
             total_loss = 0.0
@@ -76,7 +75,6 @@ class Trainer:
         return epoch_loss, epoch_acc
 
     def val_loop(self, epoch):
-        self.model.eval()
         with torch.no_grad():
             with tqdm(enumerate(self.val_dataloader), total=len(self.val_dataloader),
                       desc=f"Epoch {epoch}", leave=False) as pbar:
@@ -105,6 +103,7 @@ class Trainer:
     def train(self):
         try:
             for epoch in range(self.n_iter):
+                self.model.train()
                 epoch_loss, epoch_acc = self.train_loop(epoch)
 
                 self.writer.add_scalar("loss/train_epoch", epoch_loss, global_step=epoch)
@@ -113,6 +112,7 @@ class Trainer:
                 if self.val_dataloader is None:
                     continue
 
+                self.model.eval()
                 epoch_loss, epoch_acc = self.val_loop(epoch)
 
                 self.writer.add_scalar("loss/val_epoch", epoch_loss, global_step=epoch)
