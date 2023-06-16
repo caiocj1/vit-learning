@@ -57,10 +57,10 @@ class Trainer:
                 loss.backward()
                 self.optim.step()
 
-                # self.writer.add_scalar("lr", self.optim.param_groups[0]['lr'],
-                #                        global_step=epoch * len(self.train_dataloader) + i)
+                self.writer.add_scalar("lr", self.optim.param_groups[0]['lr'],
+                                       global_step=epoch * len(self.train_dataloader) + i)
                 # with self.warmup.dampening():
-                #     self.lr_scheduler.step()
+                self.lr_scheduler.step()
 
                 pbar.set_postfix(loss='{:.10f}'.format(loss.item()))
                 total_loss += loss.item()
@@ -104,34 +104,34 @@ class Trainer:
         return epoch_loss, epoch_acc
 
     def train(self):
-        # try:
-        for epoch in range(self.n_iter):
-            epoch_loss, epoch_acc = self.train_loop(epoch)
-            self.lr_scheduler.step()
+        try:
+            for epoch in range(self.n_iter):
+                epoch_loss, epoch_acc = self.train_loop(epoch)
+                # self.lr_scheduler.step()
 
-            self.writer.add_scalar("loss/train_epoch", epoch_loss, global_step=epoch)
-            self.writer.add_scalar("acc/train_epoch", epoch_acc, global_step=epoch)
+                self.writer.add_scalar("loss/train_epoch", epoch_loss, global_step=epoch)
+                self.writer.add_scalar("acc/train_epoch", epoch_acc, global_step=epoch)
 
-            if self.val_dataloader is None:
-                continue
+                if self.val_dataloader is None:
+                    continue
 
-            epoch_loss, epoch_acc = self.val_loop(epoch)
+                epoch_loss, epoch_acc = self.val_loop(epoch)
 
-            self.writer.add_scalar("loss/val_epoch", epoch_loss, global_step=epoch)
-            self.writer.add_scalar("acc/val_epoch", epoch_acc, global_step=epoch)
-    #     except KeyboardInterrupt:
-    #         print("Training interrupted. Logging hyperparameters.")
-    #
-    #     self.log_hparams()
-    #
-    # def log_hparams(self):
-    #     trainer_params = {key: vars(self)[key] for key in vars(self)
-    #                       if (type(vars(self)[key]) == int or type(vars(self)[key]) == float)}
-    #     self.writer.add_text("trainer_hparams", str(trainer_params), 0)
-    #
-    #     net_params = {key: vars(self.model)[key] for key in vars(self.model)
-    #                   if (type(vars(self.model)[key]) == int or type(vars(self.model)[key]) == float)}
-    #     self.writer.add_text("model_hparams", str(net_params), 0)
-    #
-    #     self.writer.flush()
-    #     self.writer.close()
+                self.writer.add_scalar("loss/val_epoch", epoch_loss, global_step=epoch)
+                self.writer.add_scalar("acc/val_epoch", epoch_acc, global_step=epoch)
+        except KeyboardInterrupt:
+            print("Training interrupted. Logging hyperparameters.")
+
+        self.log_hparams()
+
+    def log_hparams(self):
+        trainer_params = {key: vars(self)[key] for key in vars(self)
+                          if (type(vars(self)[key]) == int or type(vars(self)[key]) == float)}
+        self.writer.add_text("trainer_hparams", str(trainer_params), 0)
+
+        net_params = {key: vars(self.model)[key] for key in vars(self.model)
+                      if (type(vars(self.model)[key]) == int or type(vars(self.model)[key]) == float)}
+        self.writer.add_text("model_hparams", str(net_params), 0)
+
+        self.writer.flush()
+        self.writer.close()

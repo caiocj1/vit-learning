@@ -93,7 +93,15 @@ class ViT(nn.Module):
                  hidden_size=768, num_blocks=12, num_heads=12,
                  dropout=0.0, mlp_size=3072, num_classes=1000):
         super().__init__()
+        self.num_channels = num_channels
+        self.image_size = image_size
+        self.patch_size = patch_size
         self.hidden_size = hidden_size
+        self.num_blocks = num_blocks
+        self.num_heads = num_heads
+        self.dropout = dropout
+        self.mlp_size = mlp_size
+        self.num_classes = num_classes
 
         self.patch_embedding = PatchEmbedding(hidden_size, num_channels, image_size, patch_size)
         self.pos_encoding = nn.Parameter(torch.randn(1, 1 + self.patch_embedding.num_patches, hidden_size))

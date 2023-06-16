@@ -1,7 +1,7 @@
 # Vision Transformer Implementation
 ***
 
-Implementation of the vision transformer from [1],
+Implementation of the vision transformer from [1] in PyTorch,
 for self-educational purposes. Trains from scratch. Uses
 multiple GPUs with `nn.DataParallel`.
 
