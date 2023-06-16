@@ -18,9 +18,9 @@ class Trainer:
 
 
         self.loss_fn = nn.CrossEntropyLoss(label_smoothing=self.label_smoothing)
-        self.optim = torch.optim.Adam(model.parameters(), weight_decay=self.weight_decay, lr=self.lr)
+        self.optim = torch.optim.AdamW(model.parameters(), weight_decay=self.weight_decay, lr=self.lr)
         self.lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optim, T_max=self.n_iter * len(self.train_dataloader))
-        self.warmup = warmup.LinearWarmup(self.optim, 5 * len(self.train_dataloader))
+        # self.warmup = warmup.LinearWarmup(self.optim, 5 * len(self.train_dataloader))
         self.device = device
 
         self.writer = SummaryWriter(log_dir=f"tb_logs/{version}")
@@ -38,6 +38,7 @@ class Trainer:
         self.label_smoothing = trainer_params["label_smoothing"]
 
     def train_loop(self, epoch):
+        self.model.train()
         with tqdm(enumerate(self.train_dataloader), total=len(self.train_dataloader),
                   desc=f"Epoch {epoch}", leave=False) as pbar:
             total_loss = 0.0
@@ -54,13 +55,12 @@ class Trainer:
 
                 self.optim.zero_grad()
                 loss.backward()
-                nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
                 self.optim.step()
 
-                self.writer.add_scalar("lr", self.optim.param_groups[0]['lr'],
-                                       global_step=epoch * len(self.train_dataloader) + i)
-                with self.warmup.dampening():
-                    self.lr_scheduler.step()
+                # self.writer.add_scalar("lr", self.optim.param_groups[0]['lr'],
+                #                        global_step=epoch * len(self.train_dataloader) + i)
+                # with self.warmup.dampening():
+                #     self.lr_scheduler.step()
 
                 pbar.set_postfix(loss='{:.10f}'.format(loss.item()))
                 total_loss += loss.item()
@@ -77,6 +77,7 @@ class Trainer:
         return epoch_loss, epoch_acc
 
     def val_loop(self, epoch):
+        self.model.eval()
         with torch.no_grad():
             with tqdm(enumerate(self.val_dataloader), total=len(self.val_dataloader),
                       desc=f"Epoch {epoch}", leave=False) as pbar:
@@ -103,35 +104,34 @@ class Trainer:
         return epoch_loss, epoch_acc
 
     def train(self):
-        try:
-            for epoch in range(self.n_iter):
-                self.model.train()
-                epoch_loss, epoch_acc = self.train_loop(epoch)
+        # try:
+        for epoch in range(self.n_iter):
+            epoch_loss, epoch_acc = self.train_loop(epoch)
+            self.lr_scheduler.step()
 
-                self.writer.add_scalar("loss/train_epoch", epoch_loss, global_step=epoch)
-                self.writer.add_scalar("acc/train_epoch", epoch_acc, global_step=epoch)
+            self.writer.add_scalar("loss/train_epoch", epoch_loss, global_step=epoch)
+            self.writer.add_scalar("acc/train_epoch", epoch_acc, global_step=epoch)
 
-                if self.val_dataloader is None:
-                    continue
+            if self.val_dataloader is None:
+                continue
 
-                self.model.eval()
-                epoch_loss, epoch_acc = self.val_loop(epoch)
+            epoch_loss, epoch_acc = self.val_loop(epoch)
 
-                self.writer.add_scalar("loss/val_epoch", epoch_loss, global_step=epoch)
-                self.writer.add_scalar("acc/val_epoch", epoch_acc, global_step=epoch)
-        except KeyboardInterrupt:
-            print("Training interrupted. Logging hyperparameters.")
-
-        self.log_hparams()
-
-    def log_hparams(self):
-        trainer_params = {key: vars(self)[key] for key in vars(self)
-                          if (type(vars(self)[key]) == int or type(vars(self)[key]) == float)}
-        self.writer.add_text("trainer_hparams", str(trainer_params), 0)
-
-        net_params = {key: vars(self.model)[key] for key in vars(self.model)
-                      if (type(vars(self.model)[key]) == int or type(vars(self.model)[key]) == float)}
-        self.writer.add_text("model_hparams", str(net_params), 0)
-
-        self.writer.flush()
-        self.writer.close()
+            self.writer.add_scalar("loss/val_epoch", epoch_loss, global_step=epoch)
+            self.writer.add_scalar("acc/val_epoch", epoch_acc, global_step=epoch)
+    #     except KeyboardInterrupt:
+    #         print("Training interrupted. Logging hyperparameters.")
+    #
+    #     self.log_hparams()
+    #
+    # def log_hparams(self):
+    #     trainer_params = {key: vars(self)[key] for key in vars(self)
+    #                       if (type(vars(self)[key]) == int or type(vars(self)[key]) == float)}
+    #     self.writer.add_text("trainer_hparams", str(trainer_params), 0)
+    #
+    #     net_params = {key: vars(self.model)[key] for key in vars(self.model)
+    #                   if (type(vars(self.model)[key]) == int or type(vars(self.model)[key]) == float)}
+    #     self.writer.add_text("model_hparams", str(net_params), 0)
+    #
+    #     self.writer.flush()
+    #     self.writer.close()
