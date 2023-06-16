@@ -20,7 +20,7 @@ class Trainer:
         self.loss_fn = nn.CrossEntropyLoss(label_smoothing=self.label_smoothing)
         self.optim = torch.optim.Adam(model.parameters(), weight_decay=self.weight_decay, lr=self.lr)
         self.lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optim, T_max=self.n_iter * len(self.train_dataloader))
-        self.warmup = warmup.LinearWarmup(self.optim, 10000)
+        self.warmup = warmup.LinearWarmup(self.optim, 5 * len(self.train_dataloader))
         self.device = device
 
         self.writer = SummaryWriter(log_dir=f"tb_logs/{version}")
