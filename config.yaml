@@ -15,4 +15,4 @@ TrainerParams:
   lr: 0.0005
   weight_decay: 0.065
 
-  label_smoothing: 0.1
+  label_smoothing: 0.0
