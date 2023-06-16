@@ -49,20 +49,10 @@ if __name__ == "__main__":
         params = yaml.load(f, Loader=yaml.SafeLoader)
     vit_params = params["ViTParams"]
 
-    #vit_model = ViT(**vit_params).to(device)
-    #vit_model = vit_pytorch.ViT(image_size=224,
-                                # patch_size=32,
-                                # num_classes=1000,
-                                # dim=768,
-                                # depth=12,
-                                # heads=12,
-                                # mlp_dim=3072,
-                                # dropout=0.0)
-    vit_model = vit_b_32(dropout=0.1).to(device)
+    vit_model = ViT(**vit_params).to(device)
+    # vit_model = vit_b_32(dropout=0.1).to(device)
     vit_model = nn.DataParallel(vit_model)
 
     # ------------------ GET TRAINER AND TRAIN ------------------
-    trainer = Trainer(vit_model, train_dataloader, device, args.version,
-                      val_dataloader=val_dataloader
-                      )
+    trainer = Trainer(vit_model, train_dataloader, device, args.version, val_dataloader=val_dataloader)
     trainer.train()

@@ -17,7 +17,7 @@ class Trainer:
         self.val_dataloader = val_dataloader
 
 
-        self.loss_fn = nn.CrossEntropyLoss()
+        self.loss_fn = nn.CrossEntropyLoss(label_smoothing=self.label_smoothing)
         self.optim = torch.optim.Adam(model.parameters(), weight_decay=self.weight_decay, lr=self.lr)
         self.lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optim, T_max=self.n_iter * len(self.train_dataloader))
         self.warmup = warmup.LinearWarmup(self.optim, 10000)
@@ -34,6 +34,8 @@ class Trainer:
         self.n_iter = trainer_params["n_iter"]
         self.lr = trainer_params["lr"]
         self.weight_decay = trainer_params["weight_decay"]
+
+        self.label_smoothing = trainer_params["label_smoothing"]
 
     def train_loop(self, epoch):
         with tqdm(enumerate(self.train_dataloader), total=len(self.train_dataloader),

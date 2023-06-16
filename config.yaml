@@ -1,16 +1,18 @@
 ViTParams:
   num_channels: 3
   image_size: 224
-  patch_size: 32
+  patch_size: 16
 
   hidden_size: 768
-  num_blocks: 12
+  num_blocks: 8
   num_heads: 12
-  dropout: 0.1
-  mlp_size: 3072
+  dropout: 0.0
+  mlp_size: 2358
   num_classes: 1000
 
 TrainerParams:
-  n_iter: 300
-  lr: 0.003
-  weight_decay: 0.3
+  n_iter: 310
+  lr: 0.0005
+  weight_decay: 0.05
+
+  label_smoothing: 0.1
