@@ -20,7 +20,7 @@ class Trainer:
         self.loss_fn = nn.CrossEntropyLoss(label_smoothing=self.label_smoothing)
         self.optim = torch.optim.AdamW(model.parameters(), weight_decay=self.weight_decay, lr=self.lr)
         self.lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optim, T_max=self.n_iter * len(self.train_dataloader))
-        # self.warmup = warmup.LinearWarmup(self.optim, 5 * len(self.train_dataloader))
+        self.warmup = warmup.LinearWarmup(self.optim, 5 * len(self.train_dataloader))
         self.device = device
 
         self.writer = SummaryWriter(log_dir=f"tb_logs/{version}")
@@ -59,8 +59,8 @@ class Trainer:
 
                 self.writer.add_scalar("lr", self.optim.param_groups[0]['lr'],
                                        global_step=epoch * len(self.train_dataloader) + i)
-                # with self.warmup.dampening():
-                self.lr_scheduler.step()
+                with self.warmup.dampening():
+                    self.lr_scheduler.step()
 
                 pbar.set_postfix(loss='{:.10f}'.format(loss.item()))
                 total_loss += loss.item()
@@ -107,7 +107,6 @@ class Trainer:
         try:
             for epoch in range(self.n_iter):
                 epoch_loss, epoch_acc = self.train_loop(epoch)
-                # self.lr_scheduler.step()
 
                 self.writer.add_scalar("loss/train_epoch", epoch_loss, global_step=epoch)
                 self.writer.add_scalar("acc/train_epoch", epoch_acc, global_step=epoch)
