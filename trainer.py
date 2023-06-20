@@ -7,6 +7,7 @@ from tqdm import tqdm
 import os
 import yaml
 
+
 class Trainer:
     def __init__(self, model, train_dataloader, device, version, val_dataloader=None):
         self.read_config()
@@ -16,7 +17,6 @@ class Trainer:
         self.train_dataloader = train_dataloader
         self.val_dataloader = val_dataloader
 
-
         self.loss_fn = nn.CrossEntropyLoss(label_smoothing=self.label_smoothing)
         self.optim = torch.optim.AdamW(model.parameters(), weight_decay=self.weight_decay, lr=self.lr)
         self.lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optim, T_max=self.n_iter * len(self.train_dataloader))
@@ -24,17 +24,19 @@ class Trainer:
         self.device = device
 
         self.writer = SummaryWriter(log_dir=f"tb_logs/{version}")
+        for module, module_hparams in self.params.items():
+            self.writer.add_text(module, str(module_hparams), 0)
 
     def read_config(self):
         config_path = os.path.join(os.getcwd(), "config.yaml")
         with open(config_path) as f:
-            params = yaml.load(f, Loader=yaml.SafeLoader)
-        trainer_params = params["TrainerParams"]
+            self.params = yaml.load(f, Loader=yaml.SafeLoader)
+
+        trainer_params = self.params["TrainerParams"]
 
         self.n_iter = trainer_params["n_iter"]
         self.lr = trainer_params["lr"]
         self.weight_decay = trainer_params["weight_decay"]
-
         self.label_smoothing = trainer_params["label_smoothing"]
 
     def train_loop(self, epoch):
@@ -118,19 +120,10 @@ class Trainer:
 
                 self.writer.add_scalar("loss/val_epoch", epoch_loss, global_step=epoch)
                 self.writer.add_scalar("acc/val_epoch", epoch_acc, global_step=epoch)
+
+            print("Training ended.")
         except KeyboardInterrupt:
-            print("Training interrupted. Logging hyperparameters.")
-
-        self.log_hparams()
-
-    def log_hparams(self):
-        trainer_params = {key: vars(self)[key] for key in vars(self)
-                          if (type(vars(self)[key]) == int or type(vars(self)[key]) == float)}
-        self.writer.add_text("trainer_hparams", str(trainer_params), 0)
-
-        net_params = {key: vars(self.model)[key] for key in vars(self.model)
-                      if (type(vars(self.model)[key]) == int or type(vars(self.model)[key]) == float)}
-        self.writer.add_text("model_hparams", str(net_params), 0)
+            print("Training interrupted.")
 
         self.writer.flush()
         self.writer.close()
