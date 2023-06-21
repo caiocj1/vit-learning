@@ -6,6 +6,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
 from torchvision import transforms
+from torchvision.models import vit_b_16
 import os
 
 from trainer import Trainer
@@ -56,7 +57,8 @@ if __name__ == "__main__":
         params = yaml.load(f, Loader=yaml.SafeLoader)
     vit_params = params["ViTParams"]
 
-    vit_model = ViT(**vit_params).to(device)
+    #vit_model = ViT(**vit_params).to(device)
+    vit_model = vit_b_16()
     vit_model = nn.DataParallel(vit_model)
 
     # ------------------ GET TRAINER AND TRAIN ------------------
