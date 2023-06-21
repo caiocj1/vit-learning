@@ -58,7 +58,7 @@ if __name__ == "__main__":
     vit_params = params["ViTParams"]
 
     #vit_model = ViT(**vit_params).to(device)
-    vit_model = vit_b_16()
+    vit_model = vit_b_16().to(device)
     vit_model = nn.DataParallel(vit_model)
 
     # ------------------ GET TRAINER AND TRAIN ------------------
